@@ -25,3 +25,13 @@ app.use(express.json())
         number: "39-23-6423122"
     }
 ]
+
+app.get('/api/persons', (request, response) => {
+    res.json(persons)
+})
+
+const PORT = 3001
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
+
