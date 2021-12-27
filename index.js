@@ -3,16 +3,6 @@ const app = express()
 const morgan = require("morgan")
 
 app.use(express.json())
-
-const requestLogger = (request, response, next) => {
-    console.log('Method:', request.method)
-    console.log('Path:  ', request.path)
-    console.log('Body:  ', request.body)
-    console.log('---')
-    next()
-  }
-  
-app.use(requestLogger)
 app.use(morgan("tiny"))
 
 let persons = [
@@ -64,7 +54,7 @@ app.get("/api/persons/:id", (request, response) => {
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     notes = persons.filter(person => person.id !== id)
-  
+    console.log(`Person ${id} deleted`)
     response.status(204).end()
   })
 
@@ -101,6 +91,12 @@ app.post('/api/persons', (request, response) => {
     persons = persons.concat(person)
     response.json(person)
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+app.use(unknownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
