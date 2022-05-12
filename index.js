@@ -1,12 +1,17 @@
+require('dotenv').config()
 const express = require("express")
 const app = express()
 const morgan = require("morgan")
 const cors = require("cors")
 
+const Person = require('./models/person')
+
 app.use(express.json())
 app.use(morgan("tiny"))
 app.use(cors())
 app.use(express.static("build"))
+
+
 
 let persons = [
    {
@@ -34,7 +39,9 @@ let persons = [
 
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/info', (request, response) => {
@@ -43,9 +50,10 @@ app.get('/info', (request, response) => {
 })
 
 app.get("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id)
-    console.log(id)
-    const person = persons.find(person => person.id === id)
+    Person.findById(request.params.id).then(person => {
+        response.json(person)
+    })
+    console.log(person)
 
     if(person){
         response.json(person)
@@ -68,13 +76,13 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    //console.log(body.name)
-    //console.log(persons.find(person => person.name === body.name).name)
-    if (body.name === persons.find(person => person.name === body.name).name){
-        return response.status(400).json({
-            error: "name must be unique"
-        })
-    }
+    console.log(body.name)
+    // //console.log(persons.find(person => person.name === body.name).name)
+    // if (body.name === persons.find(person => person.name === body.name).name){
+    //     return response.status(400).json({
+    //         error: "name must be unique"
+    //     })
+    // }
 
     if (body.name === "") {
         return response.status(400).json({ 
@@ -86,13 +94,14 @@ app.post('/api/persons', (request, response) => {
             error: "no number given" 
         })
     }
-    const person = {
+    const person = new Person({
         id: generateId(),
-        content: body.name,
+        name: body.name,
         number: body.number  
-    }
-    persons = persons.concat(person)
-    response.json(person)
+    })
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 const unknownEndpoint = (request, response) => {
