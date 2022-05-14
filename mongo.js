@@ -26,16 +26,17 @@ const person = new Person({
 })
 
 if (process.argv.length > 3) {
-    person.save().then(data =>{
-        console.log(`Name: ${name} Number: ${num} added`)
-        mongoose.connection.close()
-    })
+  // eslint-disable-next-line no-unused-vars
+  person.save().then(data => {
+    console.log(`Name: ${name} Number: ${num} added`)
+    mongoose.connection.close()
+  })
 }else{
-    console.log("phonebook:")
-    Person.find({}).then(data =>{
-        data.forEach(person => {
-            console.log(person.name + ", " + person.number)
-        })
-        mongoose.connection.close()
+  console.log('phonebook:')
+  Person.find({}).then(data => {
+    data.forEach(person => {
+      console.log(person.name + ', ' + person.number)
     })
+    mongoose.connection.close()
+  })
 }
